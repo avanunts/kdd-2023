@@ -13,25 +13,6 @@ def get_session_length_dist(ds):
         y_cdf[i] = y_cdf[i - 1] + y_counts[i - 1] / num_samples
     return np.array(x_cdf), np.array(y_cdf)
 
-def get_counts(l):
-    counts = {}
-    for elem in l:
-        if elem not in counts:
-            counts[elem] = 0
-
-
-
-"""
-s_len - full session length
-prefix - prev_items
-Returns frequency of prefix from ds 
-"""
-
-
-# def get_prefix_conditional_probs(ds, s_len):
-#     prefix_length = ds.prev_items.apply(len)
-#     prefixes = ds[prefix_length == s_len - 1].prev_items.tolist()
-#
 
 def plot_session_length_dists(x_max, **configs):
     x_cdfs, y_cdfs = {}, {}
@@ -57,4 +38,36 @@ def plot_session_length_dists(x_max, **configs):
     plt.ylim(bottom=0, top=1)
     plt.xlim(left=0)
     plt.legend()
+    plt.xlabel('prev_items length')
+    plt.ylabel('cdf(x)')
     plt.show()
+
+
+def plot_frequency_dist(max_frequency, **configs):
+    plt.figure(figsize=(16, 9))
+    x_ticks = [0]
+    y_ticks = []
+    for name, config in configs.items():
+        sessions = config['sessions']
+        color = config['color']
+        _, count = np.unique(sessions.values[:, :-1].astype('int32'), return_counts=True, axis=0)
+        frequency, frequency_count = np.unique(count, return_counts=True)
+        probs = frequency_count / count.shape[0]
+        plt.plot(frequency[frequency <= max_frequency], probs[frequency <= max_frequency], label=name, color=color)
+        i_scatter = config['i_scatter']
+        x_scatter, y_scatter = frequency[i_scatter], probs[i_scatter]
+        plt.scatter(x_scatter, y_scatter, color=color)
+        i_hlines = config['i_hlines']
+        x_hlines, y_hlines = frequency[i_hlines], probs[i_hlines]
+        plt.hlines(y_hlines, [0] * len(y_hlines), x_hlines, linestyles='dashed', color=color)
+        x_ticks = x_ticks + x_hlines.tolist()
+        y_ticks = y_ticks + y_hlines.tolist()
+    plt.xticks(x_ticks)
+    plt.yticks(y_ticks)
+    plt.ylim(bottom=0)
+    plt.xlim(left=0)
+    plt.legend()
+    plt.xlabel('frequency of random unique session in ds')
+    plt.ylabel('probability of frequency')
+    plt.show()
+
