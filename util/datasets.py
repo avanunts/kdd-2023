@@ -2,10 +2,12 @@ import os
 
 import pandas as pd
 
-data_dir = os.path.join("/", "Users", "fridrihkakiev", "Downloads", "kdd 2023 datasets")
-sessions_train_path = os.path.join(data_dir, "sessions_train.csv")
-products_train_path = os.path.join(data_dir, "products_train.csv")
-sessions_test_path = os.path.join(data_dir, "sessions_test_task1.csv")
+from util.global_variables import storage_path
+
+datasets_dir_path = os.path.join(storage_path, "datasets")
+sessions_train_path = os.path.join(datasets_dir_path, "sessions_train.csv")
+products_train_path = os.path.join(datasets_dir_path, "products_train.csv")
+sessions_test_path = os.path.join(datasets_dir_path, "sessions_test_task1.csv")
 
 
 def convert_prev_items(x):
@@ -21,6 +23,7 @@ def get_sessions_train(nrows=None):
         nrows=nrows
     )
 
+
 def get_sessions_test(nrows=None):
     return pd.read_csv(
         sessions_test_path,
@@ -28,6 +31,7 @@ def get_sessions_test(nrows=None):
         converters={'prev_items': convert_prev_items},
         nrows=nrows
     )
+
 
 def get_products_train():
     return pd.read_csv(
