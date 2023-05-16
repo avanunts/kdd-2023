@@ -19,9 +19,7 @@ class KnnPredictor:
 
     def to_vectors(self, queries):
         last_item = pd.DataFrame({'last_item': queries.prev_items.apply(lambda x: x[-1]).astype('string')})
-        print(last_item.shape)
         item_to_vec = last_item.merge(self.id_to_vec, on='last_item', suffixes=('_l', '_r'))
-        print(item_to_vec.shape)
         return np.array(item_to_vec.vector.values.tolist())
 
     def to_id(self, i):
@@ -33,7 +31,5 @@ class KnnPredictor:
 
     def predict(self, queries, nn):
         vectors_q = self.to_vectors(queries)
-        print(vectors_q.shape)
         _, indices = self.index.search(vectors_q, nn)
-        print(indices.shape)
         queries['next_item_prediction'] = self.to_ids(indices)
